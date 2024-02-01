@@ -1,5 +1,5 @@
 --- 
-title: "Calles samling av visualiseringar"
+title: "Exkursioner i fågeldata"
 #author: "Calle"
 #date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -8,20 +8,17 @@ bibliography: [book.bib, packages.bib]
 # url: your book url like https://bookdown.org/yihui/bookdown
 # cover-image: path to the social sharing image like images/cover.jpg
 description: |
- En bok med visualiseringar från citizen science-baserad fågeldata. 
+ En sida med visualiseringar av fågeldata. 
 link-citations: yes
 github-repo: rstudio/bookdown-demo
 ---
 
 # Hem {-}
 
-Det här är en bok/hemsida där jag samlar och dokumenterar de visualiseringar data-utforskningar som är värda att dela. Artportalen-data, GBIF-data, och Ölands norra udde kommer spela stora roller här. 
+Det här är en hemsida där jag samlar och dokumenterar de data och visualiseringar som är värda att dela. Artportalen-data, GBIF-data, och Ölands norra udde kommer spela centrala roller här. 
 
 
 ![*Blåhake, Neptuni åkrar, 2023-05-07*](https://artportalen.se/MediaLibrary/2023/5/0096f090-5602-4df7-85f2-ba37be894f9b_image.jpg)
-
-
-![*Dvärgsparv, fyrön, 2019-04-27*](https://artportalen.se/MediaLibrary/2019/4/ea6e7d96-291b-49f6-a6da-fa460bc38726_image.jpg)
 
 
 ```{r include=FALSE}
