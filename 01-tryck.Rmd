@@ -114,9 +114,12 @@ De enskilda linjerna är alltså väldigt känsliga för enskilda drag och händ
 I Fig 1 gäller det alla unika "skådardagar", även sådana som nödvändigtvis inte bidrar till något faktiskt skådartryck. En vidare frågeställning skulle kunna vara att kolla på hur dessa linjer ser ut om man bara inkluderar skådare som *frekventerar* vardera lokal. Här kan man spekulera i hur ofta man måste besöka en lokal för att vara en sådan skådare. Man kan börja med att sätta gränsen på 10 skådardagar. Vi har nio år i datamaterialet, vilket innebär att man bör ha gjort i snitt ett besök om året för att räknas som frekvent besökare. Visst är det några rena dragare som också i snitt har gjort 10 eller fler besök på vardera lokal utan att bidra till primärskådningen, men den stora bulken av långresande kryssare lär gå bort i detta urval.
 
 
+### Förskjutna dagnummer
 
 
-
+```{r, out.width='75%', fig.align='left', echo = F}
+knitr::include_graphics('C:/projekt/book/data/julian_shift.JPG')
+```
 
 ### Relativt tryck
 
