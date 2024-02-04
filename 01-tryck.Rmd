@@ -1,79 +1,197 @@
 # Om skådartrycket på uddarna
 
-Vi har länge pratat om skillnaden i antalet människor på Ölands södra och norra udde. Ottenby har en lång tradition av fågelskådande och ringmärkning bakom sig. När många ögon och öron samlas på samma plats hittas ofta fler fåglar. Och när någon annan hittar en ovanlig fågel så är det inget stort företag att åka och titta på den. Det finns alltså mycket att vinna på att vara fler som skådar i ett begränsat område. 
+Vi har länge pratat om skillnaden i antalet skådare på Ölands södra och norra udde. 
 
-Skådartraditionen på norra udden är inte lika lång och inte lika cementerad i folkliga skådarsjälan. Från bron tar det nästan en och en halv gånger (45%) längre tid att åka till norra udden än södra udden (1 timme och 26 minuter mot 59 minuter). Dessutom kan det bli väldigt långt till närmsta drag, som med störst sannolikhet är i söder, om man inte lyckats skaka fram något själv. På norra får man således gräva sitt eget guld, om det blir något guld alls. Ändå finns numera ett gäng skådare som gärna, eller kanske hellre, skådar på norra udden.
+Ottenby har en lång tradition av fågelskådande och ringmärkning bakom sig. Förutom att det är en glödhet lokal, så hittas ofta fler fåglar när många ögon och öron samlas på samma plats. Det betyder att när någon annan skådare hittar en ovanlig fågel så är det inget stort företag att åka och titta på den. Det finns alltså spelteoretiska fördelar att skåda där det finns många skådare. "*Vart ska jag vara för att få se roliga saker? Där andra är, så klart.*"
+
+Skådartraditionen på norra udden är inte lika lång och inte lika cementerad i folkliga skådarsjälan som på södra. Följaktligen är det inte lika många som skådar där. Det finns heller ingen ringmärkning som kan förgylla dagen. Det kan därför bli väldigt långt till närmsta raritet, som med störst sannolikhet hittas där det är mycket folk, det vill säga i söder. Till råga på allt tar det, från bron, nästan en och en halv gånger (45%) längre tid att åka till norra udden än södra udden (1 timme och 26 minuter, jämfört med 59 minuter). På norra är man därför utlämnad att gräva sitt eget guld om det ska bli något guld alls. Ändå finns numera ett begränsat gäng skådare som gärna, eller kanske hellre, skådar på norra udden.
 
 Med anledning av den framgångsrika skörd på norra udden de senaste fem åren kan man ställa sig frågan hur mycket skådartrycket egentligen skiljer sig mellan uddarna. Den här sidan är ägnad till just det ämnet. 
 
 
-![*Beigekindad skogstrast, 2023-10-10*](https://artportalen.se/MediaLibrary/2023/10/051ba25f-e955-47b3-8294-1e23c01f1c5e_image.jpg)
+![*Beigekindad skogstrast, oxelspetsen, Ölands norra udde, 2023-10-10*](https://artportalen.se/MediaLibrary/2023/10/051ba25f-e955-47b3-8294-1e23c01f1c5e_image.jpg)
 
-## Data 
+## Data
 
-I materialet finns än så länge bara data från och med 2015 till och med 2023. Data består av antalet unika observatörer (inklusive medobservatörer) per dag. Dvs., om en skådare rapporterat gräsand på Ölands södra udde med två medobservatörer bidrar den rapporten alltså med "tre skådardagar" till ÖSU:s räkning den dagen. Det skiljer alltså inte mellan en flitig rapportör som rapporterar fullständiga checklistor med 60-100 arter, och en som endast rapporterar den lite extra roliga arten; här är det besökstryck av unika skådare för varje given dag som gäller. 
+I materialet ingår data från och med 2015 till och med 2023. Data består av antalet unika observatörer (inklusive medobservatörer) per dag. 
+
+Vi definierar en skådardag ett besök av en skådare på en av lokalerna, oavsett hur kort. Dvs., om en skådare rapporterat gräsand på Ölands södra udde med två medobservatörer bidrar den rapporten alltså med "tre skådardagar" till ÖSU:s räkning den dagen. Om samma gäng stannar kvar till nästa dag och rapporterar allt de ser den dagen, har det gänget hittills bidragit med sex skådardagar. Det skiljer alltså inte mellan en flitig rapportör som rapporterar fullständiga checklistor med 60-100 arter, och en som endast rapporterar den lite extra roliga arten; här är det besökstryck av unika skådare för varje given dag som räknas. 
+
+Följande analyser består av data från över en miljon rapporter.
 
 ## Besökstryck
 
-Mellan 2015 och 2023 har 1603 unika skådare (baserad på unika namn; finns flera personer med samma namn så räknas de som en) rapporterat på norra udden medan 4065 unika skådare har rapporterat på södra udden. Det är alltså ungefär 2.5 gånger fler unika besökare *som rapporterat* på södra udden jämfört med den norra. 
+Mellan 2015 och 2023 har 1599 unika skådare (baserad på unika namn; finns flera personer med samma namn så räknas de som en) rapporterat på norra udden, medan 4019 unika skådare har rapporterat på södra udden. Det är alltså ungefär 2.5 gånger fler unika besökare *som rapporterat eller varit medobservatörer* på södra udden jämfört med den norra. 
 
 ```{r, include=F}
 library(pacman)
-p_load(ggplot2, sf, dplyr, stringr, lubridate)
+p_load(ggplot2, sf, dplyr, stringr, lubridate, purrr, knitr)
 
 df <- read.csv("data/RAPPORTER_OSU_ONU.csv")
 
-ONU <- df %>% filter(site == "ONU")
-length(unique(unlist(str_split(ONU$obsare, ", ")))) # hur många unika skådare på ÖNU
-
-OSU <- df %>% filter(site == "OSU")
-length(unique(unlist(str_split(OSU$obsare, ", ")))) # hur många unika skådare på ÖSU
-
-sum(ONU$n_unique) # antalet skådardagar på ÖNU
-sum(OSU$n_unique) # antalet skådardagar på ÖSU
 
 ```
 
-Om man istället tittar på antalet skådardagar så blir det större skillnad: ÖNU har samlat på sig 8642 skådardagar mellan 2015 och 2023, medan ÖSU har samlat på sig ungefär en tiopotens fler, nämligen 87561 skådardagar. Vi kan testa att slå ut det här på säsong.
 
-```{r echo = F, results = F, message = F}
+```{r, echo = F, message = F}
+
+
+#Testa att rensa skit.
+df2 <- df 
+
+#head(df2$obsare, n = 25)
+
+rensa_obsare <- function(in_obsare, in_string){ ### OMG it works!! 
+  test2 <- str_split(in_obsare, ", ")
+  truefalse_list <- lapply(test2, function(x) str_detect(x, in_string)) 
+  filtered_list <- Map(function(x, y) x[!y], test2, truefalse_list)
+  result_vector <- sapply(filtered_list, function(x) if(length(x) == 0) NA else paste(x, collapse = ", "))
+  result_vector[result_vector == "NA"] <- NA
+  return(result_vector)
+}
+
+df2$obsare <- rensa_obsare(df2$obsare, "Via ")
+df2$obsare <- rensa_obsare(df2$obsare, "Random Persson")
+df2$obsare <- rensa_obsare(df2$obsare, "NA")
+
+rakna_obsare <- function(in_obsare){
+  as.numeric(unlist(lapply(str_split(in_obsare, ", "), function(x) length(x[!is.na(x)]))))
+}
+
+df2$n_unique2 <- rakna_obsare(df2$obsare)
+
+
+```
+
+
+```{r, include = F}
+
+ONU <- df2 %>% filter(site == "ONU")
+length(unique(unlist(str_split(ONU$obsare, ", ")))) # hur många unika skådare på ÖNU
+
+OSU <- df2 %>% filter(site == "OSU")
+length(unique(unlist(str_split(OSU$obsare, ", ")))) # hur många unika skådare på ÖSU
+
+sum(ONU$n_unique2) # antalet skådardagar på ÖNU
+sum(OSU$n_unique2) # antalet skådardagar på ÖSU
+
+```
+
+
+Om man istället tittar på antalet skådardagar så blir det större skillnad: ÖNU har samlat på sig 8320 skådardagar mellan 2015 och 2023, medan ÖSU har samlat på sig ungefär en tiopotens fler, nämligen 83569 skådardagar. Eftersom skådartrycket varierar över säsongen kan kan testa att visualisera på det här sättet (**Fig 1**).
+
+```{r echo = F, results = F, message = F, out.width = "100%"}
 
 month_breaks <- seq(from = as.Date(1, format="%j"), to = as.Date(365, format="%j"), by = "months")
 month_labels <- month(month_breaks, label = TRUE, abbr = FALSE)
 
+median_df <- df %>% group_by(site, jdate) %>% summarize(median_n_unique = median(n_unique))
 
-plot1 <- ggplot(df %>% filter(site == "ONU"), aes(x=as.Date(jdate, format="%j"), y=n_unique, group=factor(year), color=factor(site))) +
+
+plot1 <- ggplot(df %>% filter(site == "ONU"), aes(x=as.Date(jdate, format="%j"), y=n_unique, group=factor(year), color="ONU")) +
   geom_line(alpha = 0.5) + 
-  geom_line(data=df %>% filter(site == "OSU"), aes(x=as.Date(jdate, format="%j"), y=n_unique, group=factor(year), color=factor(site)), alpha = 0.5) + labs(x = "Månad", y = "Unika skådare per dag", color="Lokal") +
+  geom_line(data=df %>% filter(site == "OSU"), aes(x=as.Date(jdate, format="%j"), y=n_unique, group=factor(year), color="OSU"), alpha = 0.5) +
+  labs(x = "Månad", y = "Unika skådare per dag", color="Lokal") +
   scale_x_date(
   breaks = month_breaks,
   labels = month_labels,
-  date_labels = "%b")+ theme_classic()
+  date_labels = "%b") +
+  geom_line(data = median_df, aes(x=as.Date(jdate, format="%j"), y=median_n_unique, group=factor(site), color=factor(site)), linewidth=1.5)+
+  theme_classic()
 
 plot1
 
 ```
 
+**Figur 1.** *Skådartryck över säsongen på vardera udde. Varje tunn linje representerar "antalet unika skådare per dag" för varje enskilt år mellan 2015 och 2023, och den tjocka linjen följer medianen-antalet skådare per dag.*
+
+Det första man slås av är den stora skillnaden i besökstryck på de olika uddarna. 
+
+Vidare kan man se att ÖNU har några rejält höga avvikande pikar under hösten. Det är linjen för 2023: den höga piken en tredjedel in i oktober indikerar tillresta skådare på den beigekindade skogstrasten, påföljande pik tillresta skådare på rostsångaren, och de två sista pikarna representerar de båda helgerna då stillahavslommen kunde skådas av tillresta.
+
+De enskilda linjerna är alltså väldigt känsliga för enskilda drag och händelser. Medianen visar därför ett mer representativt värde på besökartrycket, då lika många värden ligger över som under linjen. Om man studerar Ölands norra uddes medianlinje ser man till exempel att maj, plus minus några dagar, är den enda perioden med någorlunda konsekvent täckning. Under övrig tid på året är det vanligare med inga, eller i bästa fall enstaka, skådare.
+
+I Fig 1 gäller det alla unika "skådardagar", även sådana som nödvändigtvis inte bidrar till något faktiskt skådartryck. En vidare frågeställning skulle kunna vara att kolla på hur dessa linjer ser ut om man bara inkluderar skådare som *frekventerar* vardera lokal. Här kan man spekulera i hur ofta man måste besöka en lokal för att vara en sådan skådare. Man kan börja med att sätta gränsen på 10 skådardagar. Vi har nio år i datamaterialet, vilket innebär att man bör ha gjort i snitt ett besök om året för att räknas som frekvent besökare. Visst är det några rena dragare som också i snitt har gjort 10 eller fler besök på vardera lokal utan att bidra till primärskådningen, men den stora bulken av långresande kryssare lär gå bort i detta urval.
+
+
+
+
+
+
+### Relativt tryck
+
+
+
+
 Om man delar antalet skådar dagar på norra udden med skådardagar på södra udden kan man få ut en "relativ bevakning". 
 
-```{r echo = F, results = F, message = F}
+```{r echo = F, results = F, message = F, out.width="100%"}
 
 plot2 <- df %>% group_by(jdate, site) %>% summarize(median_n = median(n_unique)) %>% 
   ggplot(aes(x=as.Date(jdate, format="%j"), y=median_n, fill=site)) + 
   geom_col(position = "fill")+
+  labs(x = "Juliansk datum", y = "Relativ bevakning", fill="Lokal") +
   scale_x_date(
   breaks = month_breaks,
   labels = month_labels,
   date_labels = "%b"  # Adjust the date format as needed
   ) +
-  labs(x = "Juliansk datum", y = "Relativ bevakning") +
   theme_classic()
 
 plot2
 
 ```
 
+**Figur 2.** *Den relativa bevakningen på vardera udde utslaget per säsong. För att anknyta till* **Fig 1** *så är det ÖNUs tjocka medianlinje som är delad med ÖSUs tjocka medianlinje.*
 
 
+### Nolldagar
+
+> Räkna NA i filen???
+
+
+## Topprapportörerna
+
+En påminnelse om att detta fortfarande gäller data från och med 2015 till och med 2023. 
+
+**Tabell 1.** Topprapportörerna för norra udden.
+
+```{r, echo = F, message = F}
+ONU_skadare <- df2 %>% filter(site == "ONU") %>% select(obsare)
+
+ONU_skadare <- ONU_skadare[!is.na(ONU_skadare),]
+
+hm_ONU <- sort(table(unlist(str_split(ONU_skadare, ", "))), decreasing=T)
+
+hm_ONU <- hm_ONU[hm_ONU >= 10]
+
+ut_table_ONU <- data.frame(head(hm_ONU, n = 10))
+
+names(ut_table_ONU) <- c("Namn", "Skådardagar")
+
+kable(ut_table_ONU, format="html")
+
+```
+
+**Tabell 2.** Topprapportörerna för södra udden.
+
+```{r, echo = F, message = F}
+
+OSU_skadare <- df2 %>% filter(site == "OSU") %>% select(obsare)
+
+OSU_skadare <- OSU_skadare[!is.na(OSU_skadare),]
+
+hm_OSU <- sort(table(unlist(str_split(OSU_skadare, ", "))), decreasing=T)
+
+hm_OSU <- hm_OSU[hm_OSU >= 10]
+
+ut_table_OSU <- data.frame(head(hm_OSU, n = 10))
+
+names(ut_table_OSU) <- c("Namn", "Skådardagar")
+
+kable(ut_table_OSU, format="html")
+
+
+```
 
 

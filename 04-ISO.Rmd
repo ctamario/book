@@ -1,0 +1,18 @@
+# ISO över året 
+
+> Foto på videsparv, ISO 52000
+
+Fredrik ondgjorde sig häromdagen över tillgängligt ljus och brusigheten i bilderna, varpå han sade att det hade varit roligt att veta hur ISO varierade över året. 
+
+>Ja, det vore det.
+
+Därför extraherade jag ISO, datum, och tid på dygnet från ett stor del av mina foton på min hårddisk. 
+
+Eftersom ISO dels beror på tiden på året och tiden på dygnet kan man tänka sig en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer i regel vara mycket lägre än ISO-värdet kl 8 mitt i vintern. 
+
+(Jag skulle behöva exkludera alla filer där jag använt blixt, där ISO blir 100. Borde bara välja alla filer där jag haft auto-ISO.)
+
+
+
+
+Scrape exif-data från över 30000 filer på hårddisken. Hur ser det ut med ISO:t över året och dygnet? Vi ska även kolla på cycliska förklaringsvariabler. 
