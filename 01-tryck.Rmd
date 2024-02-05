@@ -165,7 +165,7 @@ hm_ONU <- sort(table(unlist(str_split(ONU_skadare, ", "))), decreasing=T)
 
 hm_ONU <- hm_ONU[hm_ONU >= 10]
 
-ut_table_ONU <- data.frame(head(hm_ONU, n = 10))
+ut_table_ONU <- data.frame(head(hm_ONU, n = 30))
 
 names(ut_table_ONU) <- c("Namn", "Skådardagar")
 
@@ -183,14 +183,15 @@ OSU_skadare <- OSU_skadare[!is.na(OSU_skadare),]
 
 hm_OSU <- sort(table(unlist(str_split(OSU_skadare, ", "))), decreasing=T)
 
-hm_OSU <- hm_OSU[hm_OSU >= 10]
+hm_OSU <- hm_OSU[hm_OSU >= 1]
 
-ut_table_OSU <- data.frame(head(hm_OSU, n = 10))
+ut_table_OSU <- data.frame(head(hm_OSU, n = 5000))
 
 names(ut_table_OSU) <- c("Namn", "Skådardagar")
 
 kable(ut_table_OSU, format="html")
 
+which(ut_table_OSU$Namn == "Carl Tamario")
 
 ```
 
