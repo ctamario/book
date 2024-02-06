@@ -19,7 +19,7 @@ str(read_exif(path=filer[1]))
 read_exif(path=filer[1])$ModifyDate
 
 hm <- function(in_data){
-  hej <- data.frame(ISO = in_data$ISO, datum = in_data$ModifyDate)
+  hej <- data.frame(ISO = in_data$ISO, datum = in_data$ModifyDate, Flash=in_data$Flash)
   hej$date <- as.Date(str_replace_all(str_sub(hej$datum, 1, 10), ":", "-"))
   return(hej)
 }
@@ -219,14 +219,20 @@ ggplot(df, aes(x = jdate, y = predicted_iso)) +
 
 filer2 <- list.files(list.files("M:/DCIM/It starts over here/", full.names = T), full.names = T)
 
+alla_filer <- c(filer, filer2)
+
+############## KÖR DEN HÄR!!!!!
 
 
 start.time <- Sys.time()
-ut_data6 <- hm(read_exif(path=c(filer,filer2), tags=c("ModifyDate", "ISO")))
+ut_data_all <- read_exif(path=alla_filer, tags=c("ModifyDate", "ISO", "Flash", "Shutterspeed", "Aperture"))
 end.time <- Sys.time()
 time.taken <- end.time - start.time
 time.taken
 
+write.csv(ut_data_all, file="iso_alla_filer_ny.csv", row.names = F)
+
+as.data.frame(ut_data_all)
 
 ut_data6$month <- format(ut_data6$date, "%m")
 

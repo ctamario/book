@@ -13,11 +13,25 @@ p_load(dplyr, ggplot2, sjPlot)
 
 setwd("C:/Users/ÄGAREN/Desktop/krysshobbyrelaterat/ISO_projekt")
 
-df <- read.table("iso_alla_filer.csv")
+df <- read.csv("iso_alla_filer_ny.csv")
 
-df_clean <- df %>% select(ISO, date, time, month, jdate, hour)
+df <- df[complete.cases(df),]
+
+df$datetime <- as.POSIXct(df$ModifyDate, format="%Y:%m:%d %H:%M:%S")
+
+# Extract date information for better plotting
+df$date <- format(df$datetime, "%Y-%m-%d")
+df$time <- format(df$datetime, "%H:%M:%S")
+df$jdate <- as.numeric(format(df$datetime, "%j"))
+df$hour <- as.numeric(format(df$datetime, "%H"))
+df$month <- format(df$date, "%m")
+
+df_clean <- df %>% filter(Flash == 0) %>% filter(Aperture < 10)
 
 head(df_clean)
+
+df_clean$date2 <- as.Date(df_clean$date)
+#df_clean <- df_clean %>% filter(as.numeric(format(date2, "%Y")) < 2022)
 
 
 circular_transform <- function(jdate, hour, shift_date = 0, shift_hour = 0) {
@@ -40,8 +54,8 @@ circular_transform <- function(jdate, hour, shift_date = 0, shift_hour = 0) {
 
 results <- NULL
 
-for(i in seq(from=0, to=1, by=0.02)){
-  for(j in seq(from=0, to=1, by=0.02)){
+for(i in seq(from=0, to=1, by=0.05)){
+  for(j in seq(from=0, to=1, by=0.05)){
     shift_date_in <- i
     shift_hour_in <- j
     
@@ -76,7 +90,7 @@ results[which.min(results$AIC),]
 
 results %>% ggplot(aes(x=shift_date, y=shift_hour, color=AIC.model.)) + geom_point()
 
-shift_date_in <- 0.44
+shift_date_in <- 0.45
 shift_hour_in <- 0.3
 
 new_df <- cbind(df_clean, circular_transform(df_clean$jdate, df_clean$hour,
