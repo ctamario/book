@@ -1,4 +1,0 @@
-# ÖNUs topplista.
-
-Scraping osv.
-

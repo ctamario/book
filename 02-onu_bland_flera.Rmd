@@ -1,0 +1,26 @@
+# ÖNU bland flera
+
+```{r, eval = T, echo = F}
+
+library(pacman)
+p_load(tidyverse, rvest, httr, jsonlite,lubridate, stringr, robotstxt)
+
+```
+
+
+```{r, eval = F, echo = F}
+
+extract_list_site <- function(AP_name, site){
+  date_pattern <- "\\b\\d{4}-\\d{2}-\\d{2}\\b"
+  name_link <- paste0("https://artportalen.se/List/Top/Species/Alla%20arter/AllYears/Kommun/Borgholm/", site, "/OrderByDate/Desc/", AP_name)
+  no <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="specieslist"]/tbody') %>% html_elements(".index") %>% html_text2() %>% as.numeric()
+  species <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="specieslist"]/tbody') %>% html_elements("strong") %>% html_text2()
+  date <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="specieslist"]/tbody') %>% html_elements(".date") %>% as.character() %>% str_extract(pattern = date_pattern) %>% as.Date()
+  name <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="listheaderwrapper"]/div[2]/h2/a[1]') %>% html_text2()
+  out <- data.frame(number=no, species=species, date=date, name=name)
+  return(out)
+}
+```
+
+
+Hej på er!!!

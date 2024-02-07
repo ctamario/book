@@ -1,0 +1,95 @@
+# ÖNUs topplista
+
+Här är en figur som visar skådartoppen på ÖNU fram till 2024-02-07. Top 10 är namngivna och färgsatta och top 11-40 visas som svaga gråa linjer. Streckad och fet grå linje visar antalet arter på ÖNU-totalen.
+
+```{r, eval = T, echo = F}
+
+library(pacman)
+p_load(tidyverse, rvest, httr, jsonlite,lubridate, stringr, robotstxt)
+
+```
+
+
+```{r, eval = F, echo = F}
+
+extract_list <- function(AP_name){
+  date_pattern <- "\\b\\d{4}-\\d{2}-\\d{2}\\b"
+  name_link <- paste0("https://artportalen.se/List/Top/Species/Alla%20arter/AllYears/Kommun/Borgholm/2076994/OrderByDate/Desc/",AP_name)
+  no <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="specieslist"]/tbody') %>% html_elements(".index") %>% html_text2() %>% as.numeric()
+  species <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="specieslist"]/tbody') %>% html_elements("strong") %>% html_text2()
+  date <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="specieslist"]/tbody') %>% html_elements(".date") %>% as.character() %>% str_extract(pattern = date_pattern) %>% as.Date()
+  name <- read_html(name_link) %>% html_nodes(xpath = '//*[@id="listheaderwrapper"]/div[2]/h2/a[1]') %>% html_text2()
+  out <- data.frame(number=no, species=species, date=date, name=name)
+  return(out)
+}
+
+
+
+names_top10 <- c("TobbeBerger", "MTallroth", "Elfwing", "23628", "bjkar", "Sparven1974", "rist", "steda", "carlt", "0741")
+names_top40 <- c("MatsWaern", "Mattin", "Tallsparven", "laser-tomas", "benz", "HolmG", "onord", "andor", "FEllin", "Haol", 
+           "davidarmini", "Simson", "Labbkalle", "RonnyMalm", "Alvarsdal", "Johannes_R", "RogerJ", "Kjell-Olof", "BKylefors", "Gabrielsall",
+           "jhagg", "Langetta", "sparven", "RobertL", "Maccan", "Crexcrex", "luscinia", "Miloslav", "Mattias160", "joakimgranholm")
+
+```
+
+
+```{r, eval = F, echo = F}
+
+df_top10 <- extract_list(names_top10[1])
+for(i in 2:length(names_top10)){
+  df_top10 <- rbind(df_top10, extract_list(names_top10[i]))
+}
+
+
+df_top40 <- extract_list(names_top40[1])
+for(i in 2:length(names_top40)){
+  df_top40 <- rbind(df_top40, extract_list(names_top40[i]))
+}
+
+ONU_line <- extract_list("9273947293487234")
+
+
+```
+
+```{r savestuff, eval = F, echo = F}
+
+write.csv(df_top10, file="data/df_top10.csv", row.names = F)
+write.csv(df_top40, file="data/df_top40.csv", row.names = F)
+write.csv(ONU_line, file="data/ONU_line.csv", row.names = F)
+
+```
+
+```{r loadstuff, echo = F}
+
+df_top10 <- read.csv(file="data/df_top10.csv")
+df_top40 <- read.csv(file="data/df_top40.csv")
+ONU_line <- read.csv(file="data/ONU_line.csv")
+
+df_top10$date <- as.Date(df_top10$date)
+df_top40$date <- as.Date(df_top40$date)
+ONU_line$date <- as.Date(ONU_line$date)
+
+```
+
+
+```{r, echo = F, out.width='100%'}
+
+topp_factor <- factor(as.data.frame(df_top10 %>% group_by(name) %>% summarize(kryss = max(number)) %>% arrange(desc(kryss)))[,1])
+levels(topp_factor) <- topp_factor
+
+df_top10 %>% arrange(number) %>% ggplot(aes(x=date, y=number, color=factor(name, levels=levels(topp_factor)))) + 
+  geom_line(alpha=0.6) + 
+  labs(y="Antal arter",
+       x="År", color="Tio-i-topp på ÖNU")+
+  scale_x_date(date_breaks = "5 years", date_labels="%Y")+
+  scale_y_continuous(breaks = c(0,100,200,300))+
+  theme_classic()+
+  geom_line(data=df_top40 %>% arrange(number), aes(x=date, y=number, group=name), alpha=0.04, inherit.aes = FALSE)+
+  geom_line(data=ONU_line %>% arrange(number), aes(x=date, y=number), alpha=0.3, linetype=2, inherit.aes = FALSE)+
+  coord_cartesian(ylim = c(0, 313), xlim=c(as.Date("1987-01-01"), as.Date("2024-04-04")))+
+  annotate(geom="text", x=as.Date("2005-01-01"), y=265, label="ÖNU-totalen", color="grey", angle=13)+
+  theme(legend.position=c(0.12,0.7),
+        legend.background = element_rect(fill=alpha("white", 0.7)))
+
+```
+

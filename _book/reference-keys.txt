@@ -1,10 +1,11 @@
 om-skådartrycket-på-uddarna
 data
 besökstryck
+förskjutna-dagnummer
 relativt-tryck
 nolldagar
 topprapportörerna
-önus-topplista.
-sextio-lokaler-över-hundra
+önu-bland-flera
+önus-topplista
 iso-över-året
-förskjutna-dagnummer
+sextio-lokaler-över-hundra
