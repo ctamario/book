@@ -1,23 +1,118 @@
 # ISO över året 
 
-![*Videsparv, Lilla Sibirien, 2022-09-27*](https://artportalen.se/MediaLibrary/2022/9/f571663b-bff6-4635-b136-6fd870de9718_image.jpg)  
+![*Videsparv, Lilla Sibirien, 2022-09-27, ISO 32000*](https://artportalen.se/MediaLibrary/2022/9/f571663b-bff6-4635-b136-6fd870de9718_image.jpg)  
 
 $\\$
 
-Efter att vi varit och tittat på vittruten vid Moskogen ondgjorde Fredrik sig över tillgängligt ljus för foto, varpå han sade att det hade varit roligt att veta hur ISO varierade över året.
+Efter att vi varit och tittat på vittruten vid Moskogen sade Fredrik att det hade varit roligt att veta hur ISO varierade över året, med tanke på att det ofta är brist på ljus så här års. Det tyckte jag med. Därför extraherade jag ISO, datum, och tid på dygnet från ca 35000 av mina foton med hjälp av R-paketet `exifr`. 
 
->Vore det inte coolt att plotta hur ISO varierar över året?
->--- Fredrik
+Alla foton som är tagna med blixt exkluderades eftersom dessa är oberoende av naturligt ljus, och oftast fixerar man ISO till 100 och låter blixten jobba. 
 
->Ja, det vore det.
->--- Calle
+Jag använder i stort sett bara auto-ISO, vilket gör att ISO:t borde följa tillgången på naturligt ljus. 
 
-Därför extraherade jag ISO, datum, och tid på dygnet från ett stor del av mina foton på min hårddisk. 
+```{r, echo = F, results = F, message = F}
+library(pacman)
 
-Eftersom ISO dels beror på tiden på året och tiden på dygnet kan man tänka sig en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer i regel vara mycket lägre än ISO-värdet kl 8 mitt i vintern. 
+p_load(dplyr, ggplot2)
 
-(Jag skulle behöva exkludera alla filer där jag använt blixt, där ISO blir 100. Borde bara välja alla filer där jag haft auto-ISO.)
+df <- read.csv("data/iso_alla_filer_ny.csv")
 
-### En underrubrik {-} 
+df <- df[complete.cases(df),]
 
-Scrape exif-data från över 30000 filer på hårddisken. Hur ser det ut med ISO:t över året och dygnet? Vi ska även kolla på cycliska förklaringsvariabler. 
+df$datetime <- as.POSIXct(df$ModifyDate, format="%Y:%m:%d %H:%M:%S")
+# Extract date information for better plotting
+df$date <- format(df$datetime, "%Y-%m-%d")
+df$time <- format(df$datetime, "%H:%M:%S")
+df$jdate <- as.numeric(format(df$datetime, "%j"))
+df$hour <- as.numeric(format(df$datetime, "%H"))
+df$date2 <- as.Date(df$date)
+df$month <- format(df$date2, "%m")
+
+df_clean <- df %>% filter(Flash == 0) %>% filter(Aperture < 10)
+
+```
+
+```{r, echo = F, results = F, message = F}
+df_clean %>% group_by(month, jdate, hour) %>% summarize(mean_ISO = exp(mean(log(ISO)))) %>% 
+  ggplot(aes(x = factor(month), y = mean_ISO, group=month)) + 
+  geom_boxplot() +
+  labs(x="Month", 
+       y="ISO\n(means per hour and day)") +
+  scale_y_continuous(trans="log10")+
+  theme_classic()
+```
+
+**Figur 1.** *Hur ISO varierar över året. Rådata är först aggregerat till ett medelvärde ISO per timme och dag.*
+
+Man ser ju något slags årligt mönster, men ljustillgången beror ju inte bara på tiden på året utan också på tiden på dygnet, vilket inte alls tas hänsyn till i boxplottarna. 
+
+Nästa steg är att inkludera tid på dygnet. Eftersom dagarna är olika långa över året kan man tänka sig att det bör finnas en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer i regel vara mycket lägre än ISO-värdet kl 8 mitt i vintern. 
+
+Dessutom är både dygn och år är cykliska variabler där max-värdet också är min-värdet. Effekten som en cyklisk förklaringsvariabel har på en responsvariabel bör alltså "skarvas" sömfritt mellan det störta och minsta värdet, alltså 31 december och 1 januari. Därför transformeras både tid och år så att dessa antar cyklisk form:
+
+```{r, echo = F, results = F, message = F, fig.width=4, fig.height=3}
+circular_transform <- function(jdate, hour, shift_date = 0, shift_hour = 0) {
+  # Calculate angular variables for day of the year and hour of the day
+  jdate_angle <- ((jdate - 1) / 365 + shift_date) * 2 * pi
+  hour_angle <- ((hour / 24) + shift_hour) * 2 * pi
+  
+  # Transform to circular coordinates using sine and cosine
+  jdate_sin <- sin(jdate_angle)
+  jdate_cos <- cos(jdate_angle)
+  
+  hour_sin <- sin(hour_angle)
+  hour_cos <- cos(hour_angle)
+  
+  # Return a data frame with the transformed variables
+  transformed_data <- data.frame(jdate_sin, jdate_cos, hour_sin, hour_cos)
+  
+  return(transformed_data)
+}
+
+new_df <- cbind(df_clean, circular_transform(df_clean$jdate, df_clean$hour,
+                                             shift_date=0,
+                                             shift_hour=0))
+
+new_df_01 <- cbind(df_clean, circular_transform(df_clean$jdate, df_clean$hour,
+                                             shift_date=0,
+                                             shift_hour=0.1))
+
+new_df_02 <- cbind(df_clean, circular_transform(df_clean$jdate, df_clean$hour,
+                                             shift_date=0,
+                                             shift_hour=0.2))
+
+new_df_03 <- cbind(df_clean, circular_transform(df_clean$jdate, df_clean$hour,
+                                             shift_date=0,
+                                             shift_hour=0.3))
+
+new_df %>% ggplot(aes(x=hour, y=hour_sin)) + 
+  geom_line() + 
+  #geom_line(data=new_df_01, aes(x=hour, y=hour_sin), alpha=0.4) + 
+  #geom_line(data=new_df_02, aes(x=hour, y=hour_sin), alpha=0.2) + 
+  #geom_line(data=new_df_03, aes(x=hour, y=hour_sin), alpha=0.1) + 
+  #geom_segment(aes(x=12, xend=6, y=0, yend=0),arrow = arrow(length = unit(0.5, "cm")))+
+  theme_classic()
+
+```
+
+**Figur 2.** Dygnets linjära timmar (0-24) sin-transformation för att bli en cyklisk variabel.
+
+Men 
+
+
+```{r, echo = F, results = F, message = F, fig.width=4, fig.height=3}
+new_df %>% ggplot(aes(x=hour, y=hour_sin)) + 
+  geom_line() + 
+  geom_line(data=new_df_01, aes(x=hour, y=hour_sin), alpha=0.4) + 
+  geom_line(data=new_df_02, aes(x=hour, y=hour_sin), alpha=0.2) + 
+  geom_line(data=new_df_03, aes(x=hour, y=hour_sin), alpha=0.1) + 
+  geom_segment(aes(x=12, xend=6, y=0, yend=0),arrow = arrow(length = unit(0.5, "cm")))+
+  theme_classic()
+```
+
+**Figur 3.** Sin-transformeringen måste dock skjutas i sidled till dess att timingen bäst förklarar variationen i ISO. Den sköts i ett helt varv.
+
+
+
+
+

@@ -88,10 +88,7 @@
 </ul></li>
 <li class="chapter" data-level="2" data-path="önu-bland-flera.html"><a href="önu-bland-flera.html"><i class="fa fa-check"></i><b>2</b> ÖNU bland flera</a></li>
 <li class="chapter" data-level="3" data-path="önus-topplista.html"><a href="önus-topplista.html"><i class="fa fa-check"></i><b>3</b> ÖNUs topplista</a></li>
-<li class="chapter" data-level="4" data-path="iso-över-året.html"><a href="iso-över-året.html"><i class="fa fa-check"></i><b>4</b> ISO över året</a>
-<ul>
-<li class="chapter" data-level="" data-path="iso-över-året.html"><a href="iso-över-året.html#en-underrubrik"><i class="fa fa-check"></i>En underrubrik</a></li>
-</ul></li>
+<li class="chapter" data-level="4" data-path="iso-över-året.html"><a href="iso-över-året.html"><i class="fa fa-check"></i><b>4</b> ISO över året</a></li>
 <li class="chapter" data-level="5" data-path="sextio-lokaler-över-hundra.html"><a href="sextio-lokaler-över-hundra.html"><i class="fa fa-check"></i><b>5</b> Sextio lokaler över hundra</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -116,27 +113,23 @@
 <div id="iso-över-året" class="section level1 hasAnchor" number="4">
 <h1><span class="header-section-number">4</span> ISO över året<a href="iso-över-året.html#iso-över-året" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <div class="float">
-<img src="https://artportalen.se/MediaLibrary/2022/9/f571663b-bff6-4635-b136-6fd870de9718_image.jpg" alt="Videsparv, Lilla Sibirien, 2022-09-27" />
-<div class="figcaption"><em>Videsparv, Lilla Sibirien, 2022-09-27</em></div>
+<img src="https://artportalen.se/MediaLibrary/2022/9/f571663b-bff6-4635-b136-6fd870de9718_image.jpg" alt="Videsparv, Lilla Sibirien, 2022-09-27, ISO 32000" />
+<div class="figcaption"><em>Videsparv, Lilla Sibirien, 2022-09-27, ISO 32000</em></div>
 </div>
 <p><span class="math inline">\(\\\)</span></p>
-<p>Efter att vi varit och tittat på vittruten vid Moskogen ondgjorde Fredrik sig över tillgängligt ljus för foto, varpå han sade att det hade varit roligt att veta hur ISO varierade över året.</p>
-<blockquote>
-<p>Vore det inte coolt att plotta hur ISO varierar över året?
-— Fredrik</p>
-</blockquote>
-<blockquote>
-<p>Ja, det vore det.
-— Calle</p>
-</blockquote>
-<p>Därför extraherade jag ISO, datum, och tid på dygnet från ett stor del av mina foton på min hårddisk.</p>
-<p>Eftersom ISO dels beror på tiden på året och tiden på dygnet kan man tänka sig en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer i regel vara mycket lägre än ISO-värdet kl 8 mitt i vintern.</p>
-<p>(Jag skulle behöva exkludera alla filer där jag använt blixt, där ISO blir 100. Borde bara välja alla filer där jag haft auto-ISO.)</p>
-<div id="en-underrubrik" class="section level3 unnumbered hasAnchor">
-<h3>En underrubrik<a href="iso-över-året.html#en-underrubrik" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Scrape exif-data från över 30000 filer på hårddisken. Hur ser det ut med ISO:t över året och dygnet? Vi ska även kolla på cycliska förklaringsvariabler.</p>
+<p>Efter att vi varit och tittat på vittruten vid Moskogen sade Fredrik att det hade varit roligt att veta hur ISO varierade över året, med tanke på att det ofta är brist på ljus så här års. Det tyckte jag med. Därför extraherade jag ISO, datum, och tid på dygnet från ca 35000 av mina foton med hjälp av R-paketet <code>exifr</code>.</p>
+<p>Alla foton som är tagna med blixt exkluderades eftersom dessa är oberoende av naturligt ljus, och oftast fixerar man ISO till 100 och låter blixten jobba.</p>
+<p>Jag använder i stort sett bara auto-ISO, vilket gör att ISO:t borde följa tillgången på naturligt ljus.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><strong>Figur 1.</strong> <em>Hur ISO varierar över året. Rådata är först aggregerat till ett medelvärde ISO per timme och dag.</em></p>
+<p>Man ser ju något slags årligt mönster, men ljustillgången beror ju inte bara på tiden på året utan också på tiden på dygnet, vilket inte alls tas hänsyn till i boxplottarna.</p>
+<p>Nästa steg är att inkludera tid på dygnet. Eftersom dagarna är olika långa över året kan man tänka sig att det bör finnas en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer i regel vara mycket lägre än ISO-värdet kl 8 mitt i vintern.</p>
+<p>Dessutom är både dygn och år är cykliska variabler där max-värdet också är min-värdet. Effekten som en cyklisk förklaringsvariabel har på en responsvariabel bör alltså “skarvas” sömfritt mellan det störta och minsta värdet, alltså 31 december och 1 januari. Därför transformeras både tid och år så att dessa antar cyklisk form:</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-6-1.png" width="384" /></p>
+<p><strong>Figur 2.</strong> Dygnets linjära timmar (0-24) sin-transformation för att bli en cyklisk variabel.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-7-1.png" width="384" /></p>
+<p><strong>Figur 3.</strong> Sin-transformeringen måste dock skiftas i sidled till dess att rytmen bäst förklarar variationen i ISO.</p>
 
-</div>
 </div>
             </section>
 
