@@ -6,9 +6,9 @@ $\\$
 
 Efter att vi varit och tittat på vittruten vid Moskogen sade Fredrik att det hade varit roligt att veta hur ISO varierade över året, med tanke på att det ofta är brist på ljus så här års. Det tyckte jag med. Därför extraherade jag ISO, datum, och tid på dygnet från ca 35000 av mina foton med hjälp av R-paketet `exifr`. 
 
-Alla foton som är tagna med blixt exkluderades eftersom dessa är oberoende av naturligt ljus, och oftast fixerar man ISO till 100 och låter blixten jobba. 
+Alla foton som är tagna med blixt exkluderades eftersom dessa är oberoende av tillgången på naturligt ljus, vilket gör att de kan tas när som helst på dygnet.  Dessutom fixerar man oftast ISO till 100 och låter blixten justera ljuset. 
 
-Jag använder i stort sett bara auto-ISO, vilket gör att ISO:t borde följa tillgången på naturligt ljus. 
+På resterande bilder har jag använt i stort sett bara auto-ISO, vilket gör att ISO-värdet borde följa tillgången på naturligt ljus. 
 
 ```{r, echo = F, results = F, message = F}
 library(pacman)
@@ -44,11 +44,9 @@ df_clean %>% group_by(month, jdate, hour) %>% summarize(mean_ISO = exp(mean(log(
 
 **Figur 1.** *Hur ISO varierar över året. Rådata är först aggregerat till ett medelvärde ISO per timme och dag.*
 
-Man ser ju något slags årligt mönster, men ljustillgången beror ju inte bara på tiden på året utan också på tiden på dygnet, vilket inte alls tas hänsyn till i boxplottarna. 
+Man ser ju något slags årligt mönster, men ljustillgången beror ju inte bara på tiden på året utan också på tiden på dygnet, vilket inte alls tas hänsyn till i boxplottarna. Nästa steg är att inkludera tid på dygnet. Eftersom dagarna är olika långa över året kan man tänka sig att det bör finnas en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer vara mycket lägre än ISO-värdet kl 8 mitt i vintern. 
 
-Nästa steg är att inkludera tid på dygnet. Eftersom dagarna är olika långa över året kan man tänka sig att det bör finnas en interaktionseffekt mellan datum och tid: ISO-värdet kl 8 mitt i sommaren kommer i regel vara mycket lägre än ISO-värdet kl 8 mitt i vintern. 
-
-Dessutom är både dygn och år är cykliska variabler där max-värdet också är min-värdet. Effekten som en cyklisk förklaringsvariabel har på en responsvariabel bör alltså "skarvas" sömfritt mellan det störta och minsta värdet, alltså 31 december och 1 januari. Därför transformeras både tid och år så att dessa antar cyklisk form:
+Både dygn och år är cykliska variabler där maximum-värdet övergår i minimum-värdet (23:59:59 skarvas med 00:00:00, och dag 365 skarvas med dag 1). Därför transformeras både tid och år så att dessa antar cyklisk form:
 
 ```{r, echo = F, results = F, message = F, fig.width=4, fig.height=3}
 circular_transform <- function(jdate, hour, shift_date = 0, shift_hour = 0) {
@@ -95,9 +93,9 @@ new_df %>% ggplot(aes(x=hour, y=hour_sin)) +
 
 ```
 
-**Figur 2.** Dygnets linjära timmar (0-24) sin-transformation för att bli en cyklisk variabel.
+**Figur 2.** Dygnets linjära timmar (0-24) sin-transformerades för att bli en cyklisk variabel.
 
-Men 
+Ovan ses dygnets timmar transformade till en cyklisk variabel. Men eftersom positionen i sidled kan påverka hur väl den cykliska variabeln förklarar responsen (ISO). 
 
 
 ```{r, echo = F, results = F, message = F, fig.width=4, fig.height=3}
@@ -113,6 +111,33 @@ new_df %>% ggplot(aes(x=hour, y=hour_sin)) +
 **Figur 3.** Sin-transformeringen måste dock skjutas i sidled till dess att timingen bäst förklarar variationen i ISO. Den sköts i ett helt varv.
 
 
+```{r}
+
+
+m1 <- lm(data=new_df, log(ISO) ~ sin(2 * pi * hour / 24) * cos(2 * pi * hour / 24) * sin(2 * pi * jdate / 365) * cos(2 * pi * jdate / 365))
+
+summary(m1)
+
+new_df$predicted <- exp(predict(m1))
+
+new_df$hour_sin <- -0.15978*sin(2 * pi * new_df$hour / 24)
+new_df$hour_cos <- 0.27685*cos(2 * pi * new_df$hour / 24)
+new_df$jdate_sin <- -0.3154*sin(2 * pi * new_df$jdate / 365)
+new_df$jdate_cos <- 0.13977*cos(2 * pi * new_df$jdate / 365)
+
+
+ggplot(new_df, aes(x = jdate, y = predicted)) +
+  geom_point(aes(color=hour_cos)) +
+  labs(x = "Day of the year", y = "Predicted ISO") +
+  theme_classic()+
+  scale_color_gradient(low="skyblue", high="darkblue")+
+  theme(legend.position = "none")
+
+plot(data=new_df, (hour_cos+hour_sin)~hour) 
+lines(data=new_df, hour_cos~hour, color="red")
+lines(data=new_df, hour_sin~hour, color="blue")
+
+```
 
 
 
